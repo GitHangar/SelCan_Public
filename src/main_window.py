@@ -1,11 +1,11 @@
 import keyword
 
-import product as p
-import staff as st
-import sign as si
-import admin as a
+from . import product as p
+from . import staff as st
+from . import sign as si
+from . import admin as a
 
-from Window import LoginWindow, StaffWindow, ProductWindow, AdminWindow, SettingWindow, MainWindow
+from .Window import LoginWindow, StaffWindow, ProductWindow, AdminWindow, SettingWindow, MainWindow
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
