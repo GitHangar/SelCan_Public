@@ -21,11 +21,12 @@ class Sign:
 
     def is_admin(self, id_user):
         try:
-            database.imlec.execute("SELECT statu.name FROM user, statu WHERE user.statu_id = statu.id")
+            database.imlec.execute("SELECT statu.name FROM user, statu WHERE user.id = ? and user.statu_id = statu.id", (id_user, ))
             result = database.imlec.fetchone()[0]
             if result == "Admin":
                 return bool(result)
             else:
+                print(bool(result))
                 return bool(result)
         except TypeError:
             pass

@@ -5,7 +5,7 @@ import staff as st
 import sign as si
 import admin as a
 
-from Window import LoginWindow, StaffWindow, ProductWindow, AdminWindow, SettingWindow
+from Window import LoginWindow, StaffWindow, ProductWindow, AdminWindow, SettingWindow, MainWindow
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -27,6 +27,7 @@ staff_window = StaffWindow.Ui_MainWindow()
 product_window = ProductWindow.Ui_MainWindow()
 admin_window = AdminWindow.Ui_MainWindow()
 setting_window = SettingWindow.Ui_MainWindow()
+menu_window = MainWindow.Ui_MainWindow()
 
 main_window = QMainWindow()
 form_window = QWidget()
@@ -53,7 +54,7 @@ class main:
             if is_admin == True:
                 self.admin_window()
             else:
-                self.product_window()
+                self.menu_window()
         elif is_login == False:
             message_window.setWindowTitle("Giriş bildirimi")
             message_window.setText("Giriş başarılı değil!")
@@ -375,6 +376,7 @@ class main:
         admin_window.pushButton_products.clicked.connect(self.product_window)
         admin_window.pushButton_staff.clicked.connect(self.staff_window)
         admin_window.pushButton_company.clicked.connect(self.setting_window)
+        admin_window.pushButton_logout.clicked.connect(exit)
 
     """
     STAFF
@@ -408,4 +410,5 @@ class main:
         setting_window.tabWidget.currentChanged.connect(self.get_table)
         setting_window.tableWidget_home.clicked.connect(self.table_select)
 
-        # Listeleri güncelleme olayını çözmek gerek. İlk basmada ters kalıyor.
+    def menu_window(self):
+        menu_window.setupUi(main_window)
