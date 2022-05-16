@@ -1,7 +1,4 @@
 import database
-import product
-import staff
-import admin
 import main_window
 
 if __name__ == '__main__':

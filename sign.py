@@ -24,7 +24,6 @@ class Sign:
             database.imlec.execute("SELECT statu.name FROM user, statu WHERE user.statu_id = statu.id")
             result = database.imlec.fetchone()[0]
             if result == "Admin":
-                print(result)
                 return bool(result)
             else:
                 return bool(result)

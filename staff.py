@@ -1,4 +1,5 @@
 import database
+import sqlite3
 
 
 class Staff:
@@ -29,6 +30,11 @@ class Staff:
         result = database.imlec.fetchall()
         return result
 
+    def department_query(self, id_department):
+        database.imlec.execute("SELECT * FROM staff WHERE department_id = ?", (id_department, ))
+        result = database.imlec.fetchall()
+        return result
+
     def edit_staff(self, id_staff, name, surname, phone, email, salary, department):
         database.db.execute("UPDATE staff SET name = ?, surname = ?, phone = ?, email = ?, salary = ?, department = ? \
         WHERE id = ?", (name, surname, phone, email, salary, department, id_staff))
@@ -50,7 +56,14 @@ class Staff:
 
 class Department:
     def add(self, name):
-        database.db.execute("INSERT INTO department(name) VALUES (?)", (name, ))
+        try:
+            database.db.execute("INSERT INTO department(name) VALUES (?)", (name, ))
+            database.db.commit()
+        except sqlite3.IntegrityError:
+            pass
+
+    def edit(self, department_id, name):
+        database.db.execute("UPDATE department SET name = ? WHERE id = ?", (name, department_id))
         database.db.commit()
 
     def all_query(self):

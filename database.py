@@ -12,8 +12,8 @@ def create():
        phone INTEGER,\
        email varchar,\
        salary INTEGER,\
-       department varchar)"
-    )
+       department_id INTEGER,\
+       FOREIGN KEY(department_id) REFERENCES department(id))")
 
     db.execute("CREATE TABLE IF NOT EXISTS Product (\
         id INTEGER PRIMARY KEY AUTOINCREMENT,\
@@ -68,7 +68,8 @@ def create():
 
     db.execute("CREATE TABLE IF NOT EXISTS Department (\
         id INTEGER PRIMARY KEY AUTOINCREMENT,\
-         name varchar NOT NULL)"
+         name varchar NOT NULL,\
+         CHECK(name <> ''))"
     )
 
     db.execute("CREATE TABLE IF NOT EXISTS Category (\

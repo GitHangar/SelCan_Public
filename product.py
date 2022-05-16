@@ -1,4 +1,5 @@
 import database
+import sqlite3
 
 
 class Unit:
@@ -6,9 +7,12 @@ class Unit:
         pass
 
     def add_product(self, name, category, piece):
-        database.db.execute("INSERT INTO Product VALUES (NULL, ?, ?, ?)",
+        try:
+            database.db.execute("INSERT INTO Product VALUES (NULL, ?, ?, ?)",
                             (name, category, piece))
-        database.db.commit()
+            database.db.commit()
+        except sqlite3.IntegrityError:
+            pass
 
     def rm_product(self, id_product):
         database.db.execute(f"DELETE FROM Product WHERE id = ?",
@@ -45,12 +49,18 @@ class Unit:
 
 class Category:
     def add(self, name):
-        database.db.execute("INSERT INTO Category(Name) VALUES (?)", (name, ))
-        database.db.commit()
-        print("Add")
+        try:
+            database.db.execute("INSERT INTO Category(Name) VALUES (?)", (name, ))
+            database.db.commit()
+        except sqlite3.IntegrityError:
+            pass
 
     def rm(self, id):
         database.db.execute("DELETE FROM Category WHERE id = ?", (id, ))
+        database.db.commit()
+
+    def edit(self, category_id, name):
+        database.db.execute("UPDATE category SET name = ? WHERE id = ?", (name, category_id))
         database.db.commit()
 
     def all_query(self):

@@ -5,7 +5,7 @@ import staff as st
 import sign as si
 import admin as a
 
-from Window import LoginWindow, StaffWindow, ProductWindow, AdminWindow, SettingWindow, SettingForm
+from Window import LoginWindow, StaffWindow, ProductWindow, AdminWindow, SettingWindow
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -27,7 +27,6 @@ staff_window = StaffWindow.Ui_MainWindow()
 product_window = ProductWindow.Ui_MainWindow()
 admin_window = AdminWindow.Ui_MainWindow()
 setting_window = SettingWindow.Ui_MainWindow()
-setting_form = SettingForm.Ui_Form()
 
 main_window = QMainWindow()
 form_window = QWidget()
@@ -38,8 +37,6 @@ class main:
         self.key = None
         self.sender = None
         self.boolkey = False
-
-        print("a")
 
         login_window.setupUi(main_window)
 
@@ -153,7 +150,14 @@ class main:
                 department = staff_window.comboBox_edepartment.currentText()
                 staff.edit_staff(id_staff, name, surname, phone, mail, salary, department)
             elif self.key == "Setting":
-                pass
+                if setting_window.tab_category.isVisible() == True:
+                    id_category = setting_window.lineEdit_cid.text()
+                    name = setting_window.lineEdit_cname.text()
+                    product_category.edit(id_category, name)
+                elif setting_window.tab_department.isVisible() == True:
+                    id_department = setting_window.lineEdit_did.text()
+                    name = setting_window.lineEdit_dname.text()
+                    staff_department.edit(id_department, name)
             self.get_table()
         except IndexError:
             message_window.setWindowTitle("Hata!")
@@ -243,19 +247,31 @@ class main:
                     staff_window.pushButton_remove.setEnabled(False)
 
             elif self.key == "Setting":
-                if setting_window.tab_department.isVisible() == True:
-                    selected = setting_window.tableWidget_home.selectedItems()
-
-                    setting_window.lineEdit_did.setText(selected[0].text())
-                    setting_window.lineEdit_dname.setText(selected[1].text())
-                elif setting_window.tab_category.isVisible() == True:
+                if setting_window.tab_category.isVisible() == True:
                     selected = setting_window.tableWidget_home.selectedItems()
 
                     setting_window.lineEdit_cid.setText(selected[0].text())
                     setting_window.lineEdit_cname.setText(selected[1].text())
 
+                    result = staff.department_query(selected[0].text())
+                else:
+                    selected = setting_window.tableWidget_home.selectedItems()
+                    setting_window.lineEdit_did.setText(selected[0].text())
+                    setting_window.lineEdit_dname.setText(selected[1].text())
+                    result = staff.department_query(selected[0].text())
+
+                setting_window.tableWidget_backup.setRowCount(100)
+                setting_window.tableWidget_backup.setColumnCount(7)
+                setting_window.tableWidget_backup.clear()
+                setting_window.tableWidget_backup.setHorizontalHeaderLabels((
+                        "ID", "Name", "Surname", "Phone", "Email", "Salary", "Department"))
+                setting_window.tableWidget_backup.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+                for row_index, row_data in enumerate(result):
+                    for column_index, column_data in enumerate(row_data):
+                        setting_window.tableWidget_backup.setItem(row_index, column_index,
+                                                                      QTableWidgetItem(str(column_data)))
+
             self.selected_remove = selected
-            return selected
 
         except IndexError:
             pass
@@ -303,7 +319,6 @@ class main:
                 for column_index, column_data in enumerate(row_data):
                     setting_window.tableWidget_home.setItem(row_index, column_index, QTableWidgetItem(str(column_data)))
             self.line_clear()
-
 
     def line_clear(self):
         if self.key == "Product":
@@ -384,16 +399,13 @@ class main:
         self.key = "Setting"
 
         setting_window.setupUi(main_window)
-        print(setting_window.tab_category.isVisible())
         self.get_table()
 
         setting_window.pushButton_add.clicked.connect(self.new_add)
         setting_window.pushButton_rm.clicked.connect(self.remove)
         setting_window.pushButton_upd.clicked.connect(self.edit)
         setting_window.pushButton_reload.clicked.connect(self.get_table)
-
-        setting_window.tabWidget.tabBarClicked.connect(self.get_table)
-
+        setting_window.tabWidget.currentChanged.connect(self.get_table)
         setting_window.tableWidget_home.clicked.connect(self.table_select)
 
         # Listeleri güncelleme olayını çözmek gerek. İlk basmada ters kalıyor.
