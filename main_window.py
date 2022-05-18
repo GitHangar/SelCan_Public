@@ -1,15 +1,25 @@
-import keyword
+import datetime
 
-from . import product as p
-from . import staff as st
-from . import sign as si
-from . import admin as a
+import database
+import product as p
+import staff as st
+import sign as si
+import admin as a
+import work
 
-from .Window import LoginWindow, StaffWindow, ProductWindow, AdminWindow, SettingWindow, MainWindow
+from Window import LoginWindow
+from Window import StaffWindow
+from Window import ProductWindow
+from Window import AdminWindow
+from Window import SettingWindow
+from Window import MainWindow
+from Window import WorkAdd
+
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import sys
+import time
 
 product = p.Unit()
 product_category = p.Category()
@@ -28,6 +38,7 @@ product_window = ProductWindow.Ui_MainWindow()
 admin_window = AdminWindow.Ui_MainWindow()
 setting_window = SettingWindow.Ui_MainWindow()
 menu_window = MainWindow.Ui_MainWindow()
+work_add_window = WorkAdd.Ui_MainWindow()
 
 main_window = QMainWindow()
 form_window = QWidget()
@@ -36,8 +47,10 @@ message_window = QMessageBox()
 class main:
     def __init__(self):
         self.key = None
-        self.sender = None
         self.boolkey = False
+
+        self.staff_list = []
+        self.product_list = []
 
         login_window.setupUi(main_window)
 
@@ -83,7 +96,6 @@ class main:
         product_window.radioButton_rsure.clicked.connect(self.table_select)
 
     def new_add(self):
-        self.sender = main_window.sender().text()
         if self.key == "Product":
             name = product_window.lineEdit_name.text()
             category = product_window.comboBox_category.currentText()
@@ -104,7 +116,13 @@ class main:
             elif setting_window.tab_category.isVisible() == True:
                 name = setting_window.lineEdit_cname.text()
                 product_category.add(name)
-
+        elif self.key == "WorkAdd":
+            type_product = work_add_window.comboBox_worktype.currentText()
+            id_work = work.Task().add(type_product, datetime.datetime.now())
+            for id_product, piece_product in self.product_list:
+                for id_staff in self.staff_list:
+                    work.Product().add(id_work, id_product, piece_product)
+                    work.Staff().add(id_work, id_staff)
         self.get_table()
         self.line_clear()
 
@@ -197,51 +215,52 @@ class main:
         try:
             self.line_clear()
             if self.key == "Product":
-                selected = product_window.tableWidget.selectedItems()
+                selected_staff = product_window.tableWidget.selectedItems()
 
-                product_window.lineEdit_rid.setText(selected[0].text())
-                product_window.lineEdit_rname.setText(selected[1].text())
-                product_window.lineEdit_rcategory.setText(selected[2].text())
-                product_window.lineEdit_rpiece.setText(selected[3].text())
+                product_window.lineEdit_rid.setText(selected_staff[0].text())
+                product_window.lineEdit_rname.setText(selected_staff[1].text())
+                product_window.lineEdit_rcategory.setText(selected_staff[2].text())
+                product_window.lineEdit_rpiece.setText(selected_staff[3].text())
 
-                product_window.lineEdit_ename.setText(selected[1].text())
-                product_window.comboBox_ecategory.setCurrentText(selected[2].text())
-                product_window.spinBox_epiece.setValue(int(selected[3].text()))
+                product_window.lineEdit_ename.setText(selected_staff[1].text())
+                product_window.comboBox_ecategory.setCurrentText(selected_staff[2].text())
+                product_window.spinBox_epiece.setValue(int(selected_staff[3].text()))
                 if product_window.radioButton_rsure.isChecked() == True:
+                    self.selected_remove = selected_staff
                     product_window.pushButton_remove.setEnabled(True)
                 else:
                     product_window.pushButton_remove.setEnabled(False)
 
             elif self.key == "Staff":
-                selected = staff_window.tableWidget.selectedItems()
+                selected_staff = staff_window.tableWidget.selectedItems()
 
-                staff_window.lineEdit_rid.setText(selected[0].text())
-                staff_window.lineEdit_rname.setText(selected[1].text())
-                staff_window.lineEdit_rmail.setText(selected[2].text())
-                staff_window.lineEdit_rphone.setText(selected[3].text())
-                staff_window.lineEdit_rsalary.setText(selected[4].text())
-                staff_window.lineEdit_rdepartment.setText(selected[5].text())
+                staff_window.lineEdit_rid.setText(selected_staff[0].text())
+                staff_window.lineEdit_rname.setText(selected_staff[1].text())
+                staff_window.lineEdit_rmail.setText(selected_staff[2].text())
+                staff_window.lineEdit_rphone.setText(selected_staff[3].text())
+                staff_window.lineEdit_rsalary.setText(selected_staff[4].text())
+                staff_window.lineEdit_rdepartment.setText(selected_staff[5].text())
 
-                staff_window.lineEdit_ename.setText(selected[1].text())
-                staff_window.lineEdit_esurname.setText(selected[2].text())
-                staff_window.lineEdit_ephone.setText(selected[3].text())
-                staff_window.lineEdit_eemail.setText(selected[4].text())
-                staff_window.doubleSpinBox_esalary.setValue(float(selected[5].text()))
-                staff_window.comboBox_edepartment.setCurrentText(selected[6].text())
+                staff_window.lineEdit_ename.setText(selected_staff[1].text())
+                staff_window.lineEdit_esurname.setText(selected_staff[2].text())
+                staff_window.lineEdit_ephone.setText(selected_staff[3].text())
+                staff_window.lineEdit_eemail.setText(selected_staff[4].text())
+                staff_window.doubleSpinBox_esalary.setValue(float(selected_staff[5].text()))
+                staff_window.comboBox_edepartment.setCurrentText(selected_staff[6].text())
                 if staff_window.radioButton_rsure.isChecked() == True:
                     staff_window.pushButton_remove.setEnabled(True)
                 else:
                     staff_window.pushButton_remove.setEnabled(False)
 
             elif self.key == "Staff":
-                selected = staff_window.tableWidget.selectedItems()
+                selected_staff = staff_window.tableWidget.selectedItems()
 
-                staff_window.lineEdit_rid.setText(selected[0].text())
-                staff_window.lineEdit_rname.setText(f"{selected[1].text()} {selected[2].text()}")
-                staff_window.lineEdit_rphone.setText(selected[3].text())
-                staff_window.lineEdit_rmail.setText(selected[4].text())
-                staff_window.lineEdit_rsalary.setText(selected[5].text())
-                staff_window.lineEdit_rdepartment.setText(selected[6].text())
+                staff_window.lineEdit_rid.setText(selected_staff[0].text())
+                staff_window.lineEdit_rname.setText(f"{selected_staff[1].text()} {selected_staff[2].text()}")
+                staff_window.lineEdit_rphone.setText(selected_staff[3].text())
+                staff_window.lineEdit_rmail.setText(selected_staff[4].text())
+                staff_window.lineEdit_rsalary.setText(selected_staff[5].text())
+                staff_window.lineEdit_rdepartment.setText(selected_staff[6].text())
                 if staff_window.radioButton_rsure.isChecked() == True:
                     staff_window.pushButton_remove.setEnabled(True)
                 else:
@@ -249,17 +268,17 @@ class main:
 
             elif self.key == "Setting":
                 if setting_window.tab_category.isVisible() == True:
-                    selected = setting_window.tableWidget_home.selectedItems()
+                    selected_staff = setting_window.tableWidget_home.selectedItems()
 
-                    setting_window.lineEdit_cid.setText(selected[0].text())
-                    setting_window.lineEdit_cname.setText(selected[1].text())
+                    setting_window.lineEdit_cid.setText(selected_staff[0].text())
+                    setting_window.lineEdit_cname.setText(selected_staff[1].text())
 
-                    result = staff.department_query(selected[0].text())
+                    result = staff.department_query(selected_staff[0].text())
                 else:
-                    selected = setting_window.tableWidget_home.selectedItems()
-                    setting_window.lineEdit_did.setText(selected[0].text())
-                    setting_window.lineEdit_dname.setText(selected[1].text())
-                    result = staff.department_query(selected[0].text())
+                    selected_staff = setting_window.tableWidget_home.selectedItems()
+                    setting_window.lineEdit_did.setText(selected_staff[0].text())
+                    setting_window.lineEdit_dname.setText(selected_staff[1].text())
+                    result = staff.department_query(selected_staff[0].text())
 
                 setting_window.tableWidget_backup.setRowCount(100)
                 setting_window.tableWidget_backup.setColumnCount(7)
@@ -270,9 +289,30 @@ class main:
                 for row_index, row_data in enumerate(result):
                     for column_index, column_data in enumerate(row_data):
                         setting_window.tableWidget_backup.setItem(row_index, column_index,
-                                                                      QTableWidgetItem(str(column_data)))
+                                                                  QTableWidgetItem(str(column_data)))
+            elif self.key == "WorkAdd":
+                if len(work_add_window.tableWidget_staff.selectedRanges()) == 1:
+                    selected_staff = work_add_window.tableWidget_staff.selectedItems()
 
-            self.selected_remove = selected
+                    work_add_window.lineEdit_staffid.setText(selected_staff[0].text())
+                    work_add_window.lineEdit_staffname.setText(selected_staff[1].text())
+                    work_add_window.lineEdit_staffmail.setText(selected_staff[2].text())
+
+                    work_add_window.lineEdit_productid.clear()
+                    work_add_window.lineEdit_productname.clear()
+                    work_add_window.spinBox_productpiece.clear()
+
+                elif len(work_add_window.tableWidget_product.selectedRanges()) == 1:
+                    selected_product = work_add_window.tableWidget_product.selectedItems()
+
+                    work_add_window.lineEdit_productid.setText(selected_product[0].text())
+                    work_add_window.lineEdit_productname.setText(selected_product[1].text())
+
+                    work_add_window.lineEdit_staffid.clear()
+                    work_add_window.lineEdit_staffname.clear()
+                    work_add_window.lineEdit_staffmail.clear()
+                work_add_window.tableWidget_staff.clearSelection()
+                work_add_window.tableWidget_product.clearSelection()
 
         except IndexError:
             pass
@@ -304,7 +344,7 @@ class main:
             staff_window.lineEdit_all.setText(str(staff.total_staff()))
             staff_window.lineEdit_allval.setText(str(staff.total_salary()))
 
-        elif setting_window.tabWidget.isActiveWindow() == True:
+        elif self.key == "Setting":
             setting_window.tableWidget_home.clear()
             setting_window.tableWidget_backup.clear()
             setting_window.tableWidget_home.setHorizontalHeaderLabels((
@@ -319,6 +359,28 @@ class main:
             for row_index, row_data in enumerate(result):
                 for column_index, column_data in enumerate(row_data):
                     setting_window.tableWidget_home.setItem(row_index, column_index, QTableWidgetItem(str(column_data)))
+            self.line_clear()
+
+        elif self.key == "WorkAdd":
+            work_add_window.tableWidget_staff.clear()
+            work_add_window.tableWidget_product.clear()
+
+            work_add_window.tableWidget_staff.setHorizontalHeaderLabels(("ID", "Name", "Email"))
+            work_add_window.tableWidget_product.setHorizontalHeaderLabels(("ID", "Name", "Piece"))
+
+            work_add_window.tableWidget_staff.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            work_add_window.tableWidget_product.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            result = staff.get_workstaff()
+            work_add_window.tableWidget_staff.setRowCount(len(result))
+            for row_index, row_data in enumerate(result):
+                for column_index, column_data in enumerate(row_data):
+                    work_add_window.tableWidget_staff.setItem(row_index, column_index, QTableWidgetItem(str(column_data)))
+            database.imlec.execute("SELECT id, name, piece FROM product")
+            result = database.imlec.fetchall()
+            work_add_window.tableWidget_product.setRowCount(len(result))
+            for row_index, row_data in enumerate(result):
+                for column_index, column_data in enumerate(row_data):
+                    work_add_window.tableWidget_product.setItem(row_index, column_index, QTableWidgetItem(str(column_data)))
             self.line_clear()
 
     def line_clear(self):
@@ -363,6 +425,18 @@ class main:
             setting_window.lineEdit_cid.clear()
             setting_window.lineEdit_did.clear()
             setting_window.lineEdit_dname.clear()
+
+        elif self.key == "WorkAdd":
+            work_add_window.lineEdit_staffid.clear()
+            work_add_window.lineEdit_staffname.clear()
+            work_add_window.lineEdit_staffmail.clear()
+
+            work_add_window.lineEdit_productid.clear()
+            work_add_window.lineEdit_productname.clear()
+            work_add_window.spinBox_productpiece.clear()
+
+            self.staff_list.clear()
+            self.product_list.clear()
 
 
     """
@@ -412,3 +486,47 @@ class main:
 
     def menu_window(self):
         menu_window.setupUi(main_window)
+
+        menu_window.pushButton_workstart.clicked.connect(self.workadd_window)
+        menu_window.pushButton_products.clicked.connect(self.product_window)
+
+    def workadd_window(self):
+        self.key = "WorkAdd"
+
+        work_add_window.setupUi(main_window)
+        self.get_table()
+
+        work_add_window.tableWidget_staff.clicked.connect(self.table_select)
+        work_add_window.tableWidget_product.clicked.connect(self.table_select)
+        work_add_window.comboBox_worktype.currentText()
+
+        work_add_window.pushButton_add.clicked.connect(self.list_add)
+        work_add_window.pushButton_confirm.clicked.connect(self.new_add)
+
+    def list_add(self):
+        if work_add_window.lineEdit_staffid.text() != "":
+            staff_id = work_add_window.lineEdit_staffid.text()
+            staff_name = work_add_window.lineEdit_staffname.text()
+            staff_email = work_add_window.lineEdit_staffmail.text()
+
+            work_add_window.tableWidget_selectstaff.setHorizontalHeaderLabels((
+                        "ID", "Name", "Mail"))
+            work_add_window.tableWidget_selectstaff.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            row_num = work_add_window.tableWidget_selectstaff.rowCount()
+
+            work_add_window.tableWidget_selectstaff.setRowCount(row_num+1)
+            work_add_window.tableWidget_selectstaff.setItem(row_num, 0, QTableWidgetItem(str(staff_id)))
+            work_add_window.tableWidget_selectstaff.setItem(row_num, 1, QTableWidgetItem(str(staff_name)))
+            work_add_window.tableWidget_selectstaff.setItem(row_num, 2, QTableWidgetItem(str(staff_email)))
+        elif work_add_window.lineEdit_productid.text() != "" and work_add_window.spinBox_productpiece.text():
+            product_id = work_add_window.lineEdit_productid.text()
+            product_name = work_add_window.lineEdit_productname.text()
+            product_piece = work_add_window.spinBox_productpiece.text()
+            work_add_window.tableWidget_selectproduct.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+            row_num = work_add_window.tableWidget_selectproduct.rowCount()
+            work_add_window.tableWidget_selectproduct.setRowCount(row_num+1)
+
+            work_add_window.tableWidget_selectproduct.setItem(row_num, 0, QTableWidgetItem(str(product_id)))
+            work_add_window.tableWidget_selectproduct.setItem(row_num, 1, QTableWidgetItem(str(product_name)))
+            work_add_window.tableWidget_selectproduct.setItem(row_num, 2, QTableWidgetItem(str(product_piece)))

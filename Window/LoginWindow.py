@@ -492,6 +492,7 @@ class Ui_window(object):
         self.gridLayout.addWidget(self.label_uname, 6, 0, 1, 1)
         self.line_pass = QtWidgets.QLineEdit(self.centralwidget)
         self.line_pass.setStyleSheet("")
+        self.line_pass.setEchoMode(QtWidgets.QLineEdit.Password)
         self.line_pass.setDragEnabled(False)
         self.line_pass.setObjectName("line_pass")
         self.gridLayout.addWidget(self.line_pass, 7, 1, 1, 1)

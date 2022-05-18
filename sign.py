@@ -1,4 +1,4 @@
-from . import database
+import database
 
 
 class Sign:
@@ -12,16 +12,21 @@ class Sign:
         self.user_info = result
         return bool(result)
 
-    def fargot_pass(self, email):
+    @staticmethod
+    def fargot_pass(email):
         database.imlec.execute("SELECT email FROM user WHERE email = ?", (email, ))
         if email == database.imlec.fetchone()[0]:
             pass
         else:
             pass
 
-    def is_admin(self, id_user):
+    @staticmethod
+    def is_admin(id_user):
         try:
-            database.imlec.execute("SELECT statu.name FROM user, statu WHERE user.id = ? and user.statu_id = statu.id", (id_user, ))
+            database.imlec.execute(
+                "SELECT statu.name FROM user, statu WHERE user.id = ? and user.statu_id = statu.id",
+                (id_user, )
+            )
             result = database.imlec.fetchone()[0]
             if result == "Admin":
                 return bool(result)

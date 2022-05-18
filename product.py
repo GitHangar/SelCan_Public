@@ -1,4 +1,4 @@
-from . import database
+import database
 import sqlite3
 
 
@@ -15,9 +15,12 @@ class Unit:
             pass
 
     def rm_product(self, id_product):
-        database.db.execute(f"DELETE FROM Product WHERE id = ?",
+        try:
+            database.db.execute(f"DELETE FROM Product WHERE id = ?",
                             (id_product, ))
-        database.db.commit()
+            database.db.commit()
+        except sqlite3.IntegrityError:
+            pass
 
     def all_product(self):
         database.imlec.execute("SELECT * FROM product")
@@ -46,6 +49,11 @@ class Unit:
         for i in result:
             unit_piece += i[3]
         return unit_piece
+
+    def piece_control(self, product_id, piece):
+        database.imlec.execute("SELECT piece FROM product WHERE id = ?", (product_id, ))
+        result = database.imlec.fetchone()[0]
+        return result
 
 class Category:
     def add(self, name):

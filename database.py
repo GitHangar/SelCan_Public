@@ -85,4 +85,27 @@ def create():
         FOREIGN KEY(staff_id) REFERENCES Staff(id))"
     )
 
+    db.execute("CREATE TABLE IF NOT EXISTS work (\
+        id INTEGER PRIMARY KEY AUTOINCREMENT,\
+        type VARCHAR,\
+        created_date DATETIME)"
+    )
+
+    db.execute("CREATE TABLE IF NOT EXISTS work_staff (\
+    id INTEGER PRIMARY KEY AUTOINCREMENT, \
+    work_id INTEGER, \
+    staff_id INTEGER, \
+    FOREIGN KEY(work_id) REFERENCES work(id), \
+    FOREIGN KEY(staff_id) REFERENCES staff(id))"
+    )
+
+    db.execute("CREATE TABLE IF NOT EXISTS work_product (\
+    id INTEGER PRIMARY KEY AUTOINCREMENT, \
+    work_id INTEGER, \
+    product_id INTEGER, \
+    product_piece INTEGER, \
+    FOREIGN KEY(work_id) REFERENCES work(id), \
+    FOREIGN KEY(product_id) REFERENCES product(id))"
+    )
+
     db.commit()
